@@ -1,0 +1,82 @@
+Problem: Koko Eating Bananas (LeetCode 875)
+
+Koko has several piles of bananas. The number of bananas in each pile is given in the array.
+
+Koko can eat bananas at a speed of k bananas per hour.
+If a pile has more bananas than k, she eats k bananas and continues in the next hour.
+If a pile has less than k, she finishes that pile in one hour.
+
+Goal:
+Find the minimum eating speed (k) so that Koko can finish all the bananas within h hours.
+
+Idea:
+We use Binary Search on the eating speed.
+
+Possible speed range:
+Minimum speed = 1 banana per hour
+Maximum speed = max element in piles (largest pile)
+
+Steps:
+
+1. Start Binary Search between 1 and the maximum pile size.
+2. Pick the middle speed (mid).
+3. Check how many hours Koko needs if she eats at speed mid.
+
+To calculate hours:
+For each pile:
+hours = ceil(pile / mid)
+
+If total hours ≤ h:
+This speed works, but we try a smaller speed to minimize it.
+
+If total hours > h:
+This speed is too slow, so we increase the speed.
+
+We continue the search until we find the minimum speed that allows Koko to finish within h hours.
+
+Finally, return that minimum speed.
+
+class Solution {
+    public boolean isMin(int[] piles, int h, int mid) {
+        int count = 0;
+        for (int i = 0; i < piles.length; i++) {
+            count += piles[i] / mid;
+            if (piles[i] % mid != 0) {
+                count++;
+            }
+            if (count > h) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int minEatingSpeed(int[] piles, int h) {
+        int n = piles.length;
+        int ans = 0;
+        int st = 1;
+        int end = 0;
+        for (int i = 0; i < n; i++) {
+            end = Math.max(end, piles[i]);
+        }
+        while (st <= end) {
+            int mid = st + (end - st) / 2;
+
+            if (isMin(piles, h, mid)) {
+                ans = mid;
+                end = mid - 1;
+            } else {
+                st = mid + 1;
+            }
+        }
+
+        return ans;
+
+    }
+}
+
+Time Complexity: O(n log m)
+n = number of piles
+m = maximum pile size
+
+Space Complexity: O(1)
